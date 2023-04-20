@@ -1,7 +1,8 @@
-import generator.formula.FormulaGenerator;
+import generator.Formula.FormulaGenerator;
 
 /**
- * The main class of the logic bot.
+ * The main class of the logic bot that is used to evaluate the tableau solver. This code does not publish the
+ * tautologies on Twitter.
  */
 public class LogicBot {
 

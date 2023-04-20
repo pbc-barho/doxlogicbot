@@ -1,4 +1,4 @@
-package generator.formula;
+package generator.Formula;
 
 import lombok.Getter;
 import lombok.Setter;

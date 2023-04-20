@@ -1,10 +1,10 @@
 package solver;
 
-import generator.formula.Agent;
-import generator.formula.Formula;
-import generator.formula.InfTableauFormula;
-import generator.formula.TableauFormula;
-import generator.tree.Node;
+import generator.Formula.Agent;
+import generator.Formula.Formula;
+import generator.Formula.InfTableauFormula;
+import generator.Formula.TableauFormula;
+import generator.Tree.Node;
 import generator.connectives.unary.Belief;
 import generator.connectives.Connective;
 import generator.connectives.unary.Negation;
@@ -91,7 +91,9 @@ public class Branch {
      * @param formula The formula that should be added to the branch.
      */
     public void addFormula(ArrayList<TableauFormula> formulaList, TableauFormula formula) {
-        if (!containsFormula(formulaList, formula)) formulaList.add(formula);
+        if (!containsFormula(formulaList, formula)){
+            formulaList.add(formula);
+        }
     }
 
     /**
@@ -101,7 +103,11 @@ public class Branch {
      * @return A boolean variable indicating whether the formula is already on the branch.
      */
     public boolean containsFormula(ArrayList<TableauFormula> formulaList, TableauFormula formula){
-        for (TableauFormula tableauFormula : formulaList) if (tableauFormula.isEqual(formula)) return true;
+        for (TableauFormula tableauFormula : formulaList) {
+            if (tableauFormula.isEqual(formula)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -124,14 +130,15 @@ public class Branch {
         long startTime = System.currentTimeMillis();
         while (!leftOverFormulas.isEmpty() && (System.currentTimeMillis()-startTime)<STOPTIME){
             currentFormula = leftOverFormulas.poll();
-            assert currentFormula != null;
             Node root = currentFormula.getFormulaTree().getRoot();
             if (!root.isLeaf()) {
-                ((Connective) root.getValue()).applyRule(tableau, this, currentFormula); //currentFormula.getFormulaTree());
+                ((Connective) root.getValue()).applyRule(tableau, this, currentFormula);
             } else {
                 formulasOnBranch.add(currentFormula);
             }
-            if (isCLosed()) return true;
+            if (isCLosed()) {
+                return true;
+            }
             if ((System.currentTimeMillis()-startTime)>=STOPTIME) break;
             checkRelationsPerAgent();
             if ((System.currentTimeMillis()-startTime)>=STOPTIME) break;
@@ -141,9 +148,7 @@ public class Branch {
         }
         if (isCLosed()) {
             return true;
-        } else if (System.currentTimeMillis()-startTime >= STOPTIME) {
-            return false;
-        }
+        } else if (System.currentTimeMillis()-startTime >= STOPTIME) return false;
         return !leftOverFormulas.isEmpty();
     }
 
@@ -162,9 +167,7 @@ public class Branch {
     private boolean isCLosed() {
         ArrayList<TableauFormula> copyNegatedFormulas = new ArrayList<>(negatedFormulasOnBranch);
         for (TableauFormula formula : copyNegatedFormulas) {
-            for (TableauFormula formula2 : formulasOnBranch) {
-                if (formula.isEqual(formula2)) return true;
-            }
+            for (TableauFormula formula2 : formulasOnBranch) if (formula.isEqual(formula2)) return true;
             for (TableauFormula formula2 : copyNegatedFormulas) {
                 TableauFormula negatedFormula = new TableauFormula(new Formula (new Negation(), formula2), formula2.getState());
                 if (formula.isEqual(negatedFormula)) return true;

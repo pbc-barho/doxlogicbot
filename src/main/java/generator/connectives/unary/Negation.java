@@ -1,10 +1,10 @@
 package generator.connectives.unary;
 
-import generator.formula.Complexity;
-import generator.formula.TableauFormula;
-import generator.tree.ConnectiveNode;
-import generator.tree.Node;
-import generator.tree.Tree;
+import generator.Formula.Complexity;
+import generator.Formula.TableauFormula;
+import generator.Tree.ConnectiveNode;
+import generator.Tree.Node;
+import generator.Tree.Tree;
 import lombok.Getter;
 import lombok.Setter;
 import solver.Branch;
@@ -30,7 +30,7 @@ public class Negation extends UnaryConnective implements Serializable {
     private final int modalDepth = 0;
 
     /**
-     * The constructor of the negation including its printing symbol.
+     * Constructor of the negation including its printing symbol.
      */
     public Negation() {
         super("¬");
@@ -55,12 +55,9 @@ public class Negation extends UnaryConnective implements Serializable {
         Node leftNode = formula.getFormulaTree().getRoot().getLeft();
         Complexity leftChildComplexity = new Complexity(formula.getComplexity().getModalDepth() - 1,
                 formula.getComplexity().getNrConnectives() - 1);
-
         TableauFormula leftChild = new TableauFormula(new Tree(leftNode), formula.getState(),
                 formula.getLength() - 1, leftChildComplexity, formula.getAgents());
         branch.addFormula(branch.getFormulasOnBranch(), leftChild);
-
         if (leftNode instanceof ConnectiveNode) branch.addFormula(leftChild);
     }
-
 }

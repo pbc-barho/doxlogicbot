@@ -1,6 +1,6 @@
-package generator.formula;
+package generator.Formula;
 
-import generator.tree.*;
+import generator.Tree.*;
 import generator.connectives.unary.Belief;
 import generator.connectives.Connective;
 import generator.connectives.unary.Possibility;
@@ -22,6 +22,7 @@ public class Formula implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final int MAX_LENGTH = 280;
+
     private Complexity complexity = new Complexity(0, 0);
     private int length;
     private Tree formulaTree;
@@ -109,7 +110,9 @@ public class Formula implements Serializable {
      * @param agent The agents that gets added if it is not part of the list yet.
      */
     private void addAgent(Agent agent){
-        if (!agents.contains(agent)) agents.add(agent);
+        if (!agents.contains(agent)){
+            agents.add(agent);
+        }
     }
 
     /**
@@ -149,4 +152,5 @@ public class Formula implements Serializable {
     public boolean isFinal(){
         return getFinalLength() >= MAX_LENGTH;
     }
+
 }

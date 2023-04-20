@@ -1,6 +1,6 @@
-package generator.tree;
+package generator.Tree;
 
-import generator.formula.PropAtom;
+import generator.Formula.PropAtom;
 
 import java.io.Serial;
 import java.io.Serializable;

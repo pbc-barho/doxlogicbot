@@ -1,4 +1,4 @@
-package generator.formula;
+package generator.Formula;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,12 +37,11 @@ public class Agent implements Serializable {
      */
     public void addRelation(int world1, int world2){
         boolean add = true;
-        for (Pair relation : relations) {
+        for (Pair relation : relations)
             if (relation.getValue0() == world1 && relation.getValue1() == world2) {
                 add = false;
                 break;
             }
-        }
         if(add) relations.add(new Pair(world1, world2));
     }
 
@@ -74,14 +73,16 @@ public class Agent implements Serializable {
             relationsOld = new ArrayList<>(relations);
             ArrayList<Pair> copyRelations1 = new ArrayList<>(relations);
             ArrayList<Pair> copyRelations2 = new ArrayList<>(relations);
-            copyRelations1.forEach(relation1 -> copyRelations2.forEach(relation2 -> {
-                // transitivity
-                if (relation1.getValue1().equals(relation2.getValue0()))
-                    addRelation(relation1.getValue0(), relation2.getValue1());
-                //  euclideanicity
-                if (relation1.getValue0().equals(relation2.getValue0()))
-                    addRelation(relation1.getValue1(), relation2.getValue1());
-            }));
+            copyRelations1.forEach(relation1 -> {
+                copyRelations2.forEach(relation2 -> {
+                    // transitivity
+                    if (relation1.getValue1().equals(relation2.getValue0()))
+                        addRelation(relation1.getValue0(), relation2.getValue1());
+                    //  euclideanicity
+                    if (relation1.getValue0().equals(relation2.getValue0()))
+                        addRelation(relation1.getValue1(), relation2.getValue1());
+                });
+            });
             // seriality
             ArrayList<Integer> copyWorlds = new ArrayList<>(worlds);
             copyWorlds.forEach(world -> {

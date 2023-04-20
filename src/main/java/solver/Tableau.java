@@ -1,6 +1,6 @@
 package solver;
 
-import generator.formula.Formula;
+import generator.Formula.Formula;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +13,9 @@ import java.util.ArrayList;
 public class Tableau {
 
     private final Formula originalFormula;
+
     private ArrayList<Branch> branches = new ArrayList<>();
+
     private boolean tautology = true;
 
     /**
@@ -49,7 +51,7 @@ public class Tableau {
      * A method that adds a branch to the tableau.
      * @param branch The branch that gets added to the tableau.
      */
-    public void addBranch(Branch branch) {
+    public void addBranch(Branch branch) { // DFS
         branches.add(branch);
     }
 }

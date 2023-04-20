@@ -1,12 +1,12 @@
 package generator.connectives.unary;
 
-import generator.formula.Agent;
-import generator.formula.Complexity;
-import generator.formula.Formula;
-import generator.formula.TableauFormula;
-import generator.tree.ConnectiveNode;
-import generator.tree.Node;
-import generator.tree.Tree;
+import generator.Formula.Agent;
+import generator.Formula.Complexity;
+import generator.Formula.Formula;
+import generator.Formula.TableauFormula;
+import generator.Tree.ConnectiveNode;
+import generator.Tree.Node;
+import generator.Tree.Tree;
 import lombok.Getter;
 import lombok.Setter;
 import solver.Branch;

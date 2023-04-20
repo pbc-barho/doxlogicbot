@@ -1,14 +1,14 @@
 package generator.connectives.unary;
 
-import generator.formula.Agent;
-import generator.formula.Complexity;
-import generator.formula.Formula;
-import generator.formula.InfTableauFormula;
-import generator.formula.TableauFormula;
-import generator.tree.AtomNode;
-import generator.tree.ConnectiveNode;
-import generator.tree.Node;
-import generator.tree.Tree;
+import generator.Formula.Agent;
+import generator.Formula.Complexity;
+import generator.Formula.Formula;
+import generator.Formula.InfTableauFormula;
+import generator.Formula.TableauFormula;
+import generator.Tree.AtomNode;
+import generator.Tree.ConnectiveNode;
+import generator.Tree.Node;
+import generator.Tree.Tree;
 import lombok.Getter;
 import lombok.Setter;
 import solver.Branch;
@@ -59,8 +59,9 @@ public class Belief extends UnaryConnective implements Serializable {
     @Override
     public void applyRule(Tableau tableau, Branch branch, TableauFormula formula) {
 
-        if (!containsFormula(branch.getInfFormulas(), new InfTableauFormula(formula, agent.getRelations())))
+        if (!containsFormula(branch.getInfFormulas(), new InfTableauFormula(formula, agent.getRelations()))) {
             branch.getInfFormulas().add(new InfTableauFormula(formula, agent.getRelations()));
+        }
 
         Node leftNode = formula.getFormulaTree().getRoot().getLeft();
 
@@ -72,12 +73,11 @@ public class Belief extends UnaryConnective implements Serializable {
         agent.getRelations().forEach(pair -> {
             if (pair.getValue0().equals(formula.getState())){
                 leftChild.setState(pair.getValue1());
+
                 branch.addFormula(branch.getFormulasOnBranch(), leftChild);
-                if (leftNode instanceof ConnectiveNode) {
-                    if (!(leftNode.getValue() instanceof Negation) || !(leftNode.getLeft() instanceof AtomNode)){
+                if (leftNode instanceof ConnectiveNode)
+                    if (!(leftNode.getValue() instanceof Negation) || !(leftNode.getLeft() instanceof AtomNode))
                         branch.addFormula(leftChild);
-                    }
-                }
             }
         });
     }

@@ -1,4 +1,4 @@
-package generator.tree;
+package generator.Tree;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package generator.tree;
+package generator.Tree;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -72,27 +72,29 @@ public abstract class Node implements Serializable {
         boolean unary = false;
         if (!first) buffer.append("(");
         buffer.append(prefix);
-        if (left != null ) if (left.isLeaf()) {
-            if (right == null) {
-                if (!first) buffer.deleteCharAt(buffer.length() - 1);
-                alreadyPrinted = true;
-                buffer.append(printValue()).append(left.printValue());
-                unary = true;
-            } else {
-                buffer.append(left.printValue());
-                if (!first) {
+        if (left != null ) {
+            if (left.isLeaf()) {
+                if (right == null) {
+                    if (!first) buffer.deleteCharAt(buffer.length() - 1);
                     alreadyPrinted = true;
-                    buffer.append(" ").append(printValue());
+                    buffer.append(printValue()).append(left.printValue());
+                    unary = true;
+                } else {
+                    buffer.append(left.printValue());
+                    if (!first) {
+                        alreadyPrinted = true;
+                        buffer.append(" ").append(printValue());
+                    }
                 }
+            } else {
+                if (right == null) {
+                    if (!first) buffer.deleteCharAt(buffer.length() - 1);
+                    alreadyPrinted = true;
+                    buffer.append(printValue());
+                    unary = true;
+                }
+                left.printString(buffer, childrenPrefix, childrenPrefix, false);
             }
-        } else {
-            if (right == null) {
-                if (!first) buffer.deleteCharAt(buffer.length() - 1);
-                alreadyPrinted = true;
-                buffer.append(printValue());
-                unary = true;
-            }
-            left.printString(buffer, childrenPrefix, childrenPrefix, false);
         }
         if (first && !unary) {
             if (!(left == null && right == null)) buffer.append(" ");
@@ -100,11 +102,13 @@ public abstract class Node implements Serializable {
             buffer.append(printValue());
         }
         if (!alreadyPrinted) buffer.append(" ").append(printValue());
-        if (right != null ) if (right.isLeaf()) {
-            buffer.append(" ").append(right.printValue());
-        } else {
-            buffer.append(" ");
-            right.printString(buffer, childrenPrefix, childrenPrefix, false);
+        if (right != null ) {
+            if (right.isLeaf()) {
+                buffer.append(" ").append(right.printValue());
+            } else {
+                buffer.append(" ");
+                right.printString(buffer, childrenPrefix, childrenPrefix, false);
+            }
         }
         if (!first && !unary) buffer.append(")");
     }

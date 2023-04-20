@@ -1,7 +1,7 @@
 package generator.connectives.unary;
 
-import generator.formula.Formula;
-import generator.formula.TableauFormula;
+import generator.Formula.Formula;
+import generator.Formula.TableauFormula;
 import generator.connectives.Connective;
 import io.Serializer;
 import lombok.Getter;
@@ -27,7 +27,6 @@ public abstract class UnaryConnective extends Connective implements Serializable
      * The default length of a printed unary connective.
      */
     public int length = 1;
-
     private int modalDepth;
 
     /**
@@ -43,6 +42,26 @@ public abstract class UnaryConnective extends Connective implements Serializable
 
     @Override
     public abstract void applyNegatedRule(Tableau tableau, Branch branch, TableauFormula formula);
+
+    @Override
+    public ArrayList<Formula> generateSelectedFormulas(int nrConnectives) {
+        ArrayList<Formula> newFormulas = new ArrayList<>();
+        ArrayList<Formula> formulas = Serializer.loadFormulas(nrConnectives + "_nr_connectives.ser");
+        while (newFormulas.size() <= 25 && formulas != null && formulas.size() > 0) {
+            int oldSize = newFormulas.size();
+            Formula randomFormula = chooseRandomFormula(formulas);
+            Formula newFormula = new Formula(this, randomFormula);
+            while (duplicatedFormula(newFormula, newFormulas) && formulas.size() > 1) {
+                formulas.remove(randomFormula);
+                randomFormula = chooseRandomFormula(formulas);
+                newFormula = new Formula(this, randomFormula);
+            }
+            formulas.remove(randomFormula);
+            if (!duplicatedFormula(newFormula, newFormulas)) newFormulas.add(newFormula);
+            if (newFormulas.size() == oldSize) break;
+        }
+        return newFormulas;
+    }
 
     @Override
     public ArrayList<Formula> generateAllFormulas(int nrConnectives) {

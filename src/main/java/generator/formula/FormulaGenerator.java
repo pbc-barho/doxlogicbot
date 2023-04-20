@@ -1,4 +1,4 @@
-package generator.formula;
+package generator.Formula;
 
 import generator.connectives.*;
 import generator.connectives.binary.Biimplication;
@@ -13,6 +13,7 @@ import lombok.Getter;
 import solver.TableauSolver;
 
 import java.util.ArrayList;
+
 
 /**
  * The class that implements the formula generator.
@@ -34,12 +35,11 @@ public class FormulaGenerator implements Runnable {
     }
 
     /**
-     * The main method of the formula generator that generates all formulas and starts the tableau solver after
-     * generating the formulas with one connective.
+     * The main method of the formula generator that generates formulas with up to 6 connectives and starts the tableau
+     * solver after generating the formulas with one connective.
      */
     @Override
     public void run() {
-
         nrConnectives = 0;
         initializeConnectives();
         addAtoms();
@@ -51,64 +51,13 @@ public class FormulaGenerator implements Runnable {
             addFormulas();
             storeFormulas();
 
-            if (nrConnectives == 1) new Thread(new TableauSolver(this)).start();
-
-            if (generatedFormulas.isEmpty()) running = false;
-        }
-    }
-
-    /**
-     * This method chooses a random formula that has not been solved yet out of all existing files containing formulas
-     * and deletes the formula afterwards from the file.
-     * @return A random formula that has not been solved yet.
-     */
-    public Formula chooseRandomFormula() {
-
-        randomFile = (int)(Math.random() * nrConnectives);
-        if (randomFile == nrConnectives) randomFile -= 1;
-        ArrayList<Formula> formulas = Serializer.loadFormulas(randomFile + "_nr_connectives_solve.ser");
-        if (formulas == null || formulas.size() == 0) {
-            ArrayList<Integer> existingFiles = new ArrayList<>();
-            for (int i = 0; i < nrConnectives; i++){
-                existingFiles.add(i);
+            if (generatedFormulas.isEmpty() || nrConnectives == 6){
+                running = false;
             }
-            existingFiles.remove(randomFile);
-            formulas = chooseOtherFile(existingFiles);
         }
-        if (formulas != null) {
-            int randomIndex = (int)(Math.random() * formulas.size());
-            Formula randomFormula = formulas.get(randomIndex);
-            if (randomFormula.getStatus() != 0){
-                return chooseRandomFormula();
-            } else {
-                formulas.remove(randomIndex);
-                Serializer.saveFormulas(formulas, randomFile + "_nr_connectives_solve.ser");
-                return randomFormula;
-            }
-        } else {
-            return null;
-        }
-    }
 
-    /**
-     * This method is recursively loading files to find a random formula in one of the files that has not been solved
-     * yet. If no other files are left it returns null.
-     * @param existingFiles A list of generated files.
-     * @return A list of formulas that were loaded from a file. It returns null if no such file exists.
-     */
-    private ArrayList<Formula> chooseOtherFile(ArrayList<Integer> existingFiles) {
-        if (existingFiles.isEmpty()) {
-            return null;
-        }
-        int newRandomIndex = (int)(Math.random() * existingFiles.size());
-        randomFile = existingFiles.get(newRandomIndex);
-        ArrayList<Formula> formulas = Serializer.loadFormulas(existingFiles.get(newRandomIndex) + "_nr_connectives_solve.ser");
-        if (formulas == null || formulas.size() == 0) {
-            existingFiles.remove(newRandomIndex);
-            return chooseOtherFile(existingFiles);
-        } else {
-            return formulas;
-        }
+        Thread thread2 = new Thread(new TableauSolver(this));
+        thread2.start();
     }
 
     /**
@@ -126,7 +75,11 @@ public class FormulaGenerator implements Runnable {
     private void addFormulas() {
         connectives.forEach(connective -> {
             ArrayList<Formula> newFormulas;
-            newFormulas = connective.generateAllFormulas(nrConnectives - 1);
+            if (nrConnectives <= 1) {
+                newFormulas = connective.generateAllFormulas(nrConnectives - 1);
+            } else {
+                newFormulas = connective.generateSelectedFormulas(nrConnectives - 1);
+            }
             newFormulas.forEach(this::saveFormula);
         });
     }
@@ -170,7 +123,7 @@ public class FormulaGenerator implements Runnable {
             String fileName = nrConnectives + "_nr_connectives.ser";
             Serializer.saveFormulas(generatedFormulas, fileName);
             fileName = nrConnectives + "_nr_connectives_solve.ser";
-            Serializer.saveFormulas(generatedFormulas, fileName); // for the solver to solve
+            Serializer.saveFormulas(generatedFormulas, fileName);
 
             for (Formula generatedFormula : generatedFormulas) {
                 fileName = generatedFormula.getComplexity().getModalDepth() + "_modal_depth.ser";

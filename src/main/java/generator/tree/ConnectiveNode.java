@@ -1,4 +1,4 @@
-package generator.tree;
+package generator.Tree;
 
 import generator.connectives.Connective;
 import lombok.Getter;

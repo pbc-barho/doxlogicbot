@@ -1,16 +1,14 @@
 package solver;
 
-import generator.formula.Agent;
-import generator.formula.Formula;
-import generator.formula.FormulaGenerator;
+import generator.Formula.Agent;
+import generator.Formula.Formula;
+import generator.Formula.FormulaGenerator;
 
 import java.util.ArrayList;
 
 import generator.connectives.unary.Negation;
-import io.Publisher;
 import io.Serializer;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 /**
  * A class implementing the tableau solver.
@@ -19,8 +17,6 @@ import lombok.SneakyThrows;
 public class TableauSolver implements Runnable {
 
     private final FormulaGenerator generator;
-
-    private ArrayList<Formula> tautologies = new ArrayList<>();
 
     /**
      * Constructor of the tableau solver.
@@ -31,37 +27,66 @@ public class TableauSolver implements Runnable {
     }
 
     /**
-     * The main method of the tableau solver. It runs when there are still formulas that can be evaluated and sleeps
-     * otherwise. It chooses a random formula from the generated formulas and evaluates whether it is a tautology. If
-     * that is the case it gets added to a tautology list. When the first tautology gets stored in that list, the
-     * Twitter publisher gets started.
+     * The main method of the tableau solver. It runs until all the formulas that were generated are solved
+     * (with up to 6 connectives). It measures the run time and RAM usage per formula and stores the information in a
+     * csv-file.
      */
-    @SneakyThrows
     @Override
     public void run() {
-        boolean formulasToSolve = checkFormulas();
-        boolean posting = false;
-        while (formulasToSolve) {
-            Formula currentFormula = generator.chooseRandomFormula();
-            if (currentFormula != null) {
-                solveTableau(currentFormula);
-                if (currentFormula.getStatus() == 2) tautologies.add(currentFormula);
-                currentFormula.getAgents().forEach(Agent::reset);
-                if (tautologies.size() > 0 && !posting) {
-                    posting = true;
-                    startPublisher();
-                }
-            } else {
-                Thread.sleep(3600000);
-            }
-            formulasToSolve = checkFormulas();
-            if (!formulasToSolve) {
-                while (!formulasToSolve) {
-                    Thread.sleep(3600000);
+        for (int complexity = 1; complexity < 7; complexity++) {
+            boolean formulasToSolve = checkFormulas();
+            Serializer.makeFile(complexity + "_nrcon.csv");
+            while (formulasToSolve) {
+                Formula currentFormula = runFile(complexity);
+                if (currentFormula != null) {
+                    long startTime = System.nanoTime();
+                    solveTableau(currentFormula);
+                    Runtime runtime = Runtime.getRuntime();
+                    runtime.gc();
+                    long memory = runtime.totalMemory() - runtime.freeMemory();
+                    long endTime = System.nanoTime();
+                    saveData(currentFormula, startTime, endTime, memory, currentFormula.getStatus());
+                    currentFormula.getAgents().forEach(Agent::reset);
                     formulasToSolve = checkFormulas();
+                } else {
+                    break;
                 }
             }
+            Serializer.closeFile();
         }
+    }
+
+    /**
+     * A method that calculates the run time of the tableau solver when validating a formula and saves the data per
+     * formula to the CSV-file.
+     * @param formula The formula that got solved.
+     * @param startTime The starting time of the tableau solver.
+     * @param endTime The ending time of the tableau solver.
+     * @param memory The RAM usage of the tableau solver during the evaluation of the formula.
+     * @param status The status indicating whether or not the formula is a tautology.
+     */
+    private void saveData(Formula formula, long startTime, long endTime, long memory, int status) {
+        long execTime = endTime - startTime;
+        String formulaString = formula.getFormulaTree().getString();
+        boolean tautology = status != 1;
+        Serializer.saveFormulaData(formulaString, execTime, memory, tautology);
+    }
+
+    /**
+     * This method loads a file of a certain complexity and removes the first formula on it. This formula will be
+     * solved. If the file is empty the method returns null.
+     * @param i The complexity of the formula that should be solved.
+     * @return The first formula on the file or null.
+     */
+    private Formula runFile(int i) {
+        ArrayList<Formula> formulas = Serializer.loadFormulas(i + "_nr_connectives_solve.ser");
+        if(formulas == null || formulas.size() == 0) {
+            return null;
+        }
+        Formula currentFormula = formulas.get(0);
+        formulas.remove(0);
+        Serializer.saveFormulas(formulas, i + "_nr_connectives_solve.ser");
+        return currentFormula;
     }
 
     /**
@@ -74,22 +99,15 @@ public class TableauSolver implements Runnable {
             String fileToRun = i + "_nr_connectives_solve.ser";
             ArrayList<Formula> formulas = Serializer.loadFormulas(fileToRun);
             if (formulas != null) {
-                if (formulas.size() != 0) {
+                if (formulas.size() != 0 ) {
                     return true;
                 }
+            } else {
+                return false;
             }
             maxConnectives++;
         }
         return false;
-    }
-
-    /**
-     * This method initializes and starts the Twitter publisher. It gets called once the first tautology was stored in
-     * the tautology list.
-     */
-    private void startPublisher() {
-        Thread thread = new Thread(new Publisher(this));
-        thread.start();
     }
 
     /**

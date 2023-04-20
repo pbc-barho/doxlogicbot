@@ -1,7 +1,7 @@
-package generator.formula;
+package generator.Formula;
 
-import generator.tree.Node;
-import generator.tree.Tree;
+import generator.Tree.Node;
+import generator.Tree.Tree;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +20,7 @@ public class TableauFormula extends Formula implements Serializable {
     private static final long serialVersionUID = 17L;
 
     private int priority = 0;
-    private int state;
+    private int state = 0;
 
     /**
      * Constructor for a tableau formula that starts a tableau.

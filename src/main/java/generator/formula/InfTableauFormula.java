@@ -1,6 +1,6 @@
-package generator.formula;
+package generator.Formula;
 
-import generator.tree.Node;
+import generator.Tree.Node;
 import generator.connectives.Connective;
 import solver.Branch;
 
@@ -37,11 +37,12 @@ public class InfTableauFormula extends TableauFormula implements Serializable {
      */
     public void applyNewRelations(ArrayList<Pair> relations, Branch branch) {
         relations.forEach(relation1 -> {
-            if (relation1.getValue0().equals(this.getState()))
-                if (!oldRelations.contains(new Pair(this.getState(), relation1.getValue1()))) {
+            if (relation1.getValue0().equals(this.getState())) {
+                if (!oldRelations.contains(new Pair(this.getState(), relation1.getValue1()))){
                     Node root = this.getFormulaTree().getRoot();
                     if (!root.isLeaf()) ((Connective) root.getValue()).applyRule(branch.getTableau(), branch, this);
                 }
+            }
         });
     }
 }

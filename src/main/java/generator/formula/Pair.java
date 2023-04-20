@@ -1,4 +1,4 @@
-package generator.formula;
+package generator.Formula;
 
 import java.io.Serial;
 import java.io.Serializable;
