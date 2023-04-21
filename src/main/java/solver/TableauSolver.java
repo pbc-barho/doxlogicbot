@@ -52,12 +52,12 @@ public class TableauSolver implements Runnable {
                     startPublisher();
                 }
             } else {
-                Thread.sleep(10000);
+                Thread.sleep(100);
             }
             formulasToSolve = checkFormulas();
             if (!formulasToSolve) {
                 while (!formulasToSolve) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                     formulasToSolve = checkFormulas();
                 }
             }
@@ -78,7 +78,7 @@ public class TableauSolver implements Runnable {
                     return true;
                 }
             }
-            maxConnectives++;
+            if (maxConnectives <= generator.getNrConnectives()) maxConnectives++;
         }
         return false;
     }
