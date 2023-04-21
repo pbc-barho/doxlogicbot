@@ -54,10 +54,11 @@ public class Publisher implements Runnable {
                 } else {
                     try {
                         int randomIndex = (int)(Math.random() * solver.getTautologies().size());
+                        Thread.sleep(300000);
                         String tweet = solver.getTautologies().get(randomIndex).getFormulaTree().getString();
                         solver.getTautologies().remove(randomIndex);
                         twitter.updateStatus(tweet);
-                        Thread.sleep(10800000);
+                        Thread.sleep(10500000);
                     } catch(Exception e) {
                         continue;
                     }
