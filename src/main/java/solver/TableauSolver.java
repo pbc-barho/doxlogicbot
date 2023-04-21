@@ -52,12 +52,12 @@ public class TableauSolver implements Runnable {
                     startPublisher();
                 }
             } else {
-                Thread.sleep(3600000);
+                Thread.sleep(10000);
             }
             formulasToSolve = checkFormulas();
             if (!formulasToSolve) {
                 while (!formulasToSolve) {
-                    Thread.sleep(3600000);
+                    Thread.sleep(10000);
                     formulasToSolve = checkFormulas();
                 }
             }

@@ -21,7 +21,9 @@ public class Serializer {
         try (FileOutputStream fileOutputStream = new FileOutputStream(saveDirectory + File.separator + fileName, true);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(formula);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            return;
+        }
     }
 
     /**
@@ -35,7 +37,9 @@ public class Serializer {
         try (FileOutputStream fileOutputStream = new FileOutputStream(saveDirectory + File.separator + fileName);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(formula);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            return;
+        }
     }
 
     /**

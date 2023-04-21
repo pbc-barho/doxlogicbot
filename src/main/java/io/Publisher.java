@@ -58,7 +58,8 @@ public class Publisher implements Runnable {
                         solver.getTautologies().remove(randomIndex);
                         twitter.updateStatus(tweet);
                         Thread.sleep(10800000);
-                    } catch(Exception ignored) {
+                    } catch(Exception e) {
+                        continue;
                     }
                 }
             }
